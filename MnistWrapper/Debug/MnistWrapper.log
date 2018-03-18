@@ -1,0 +1,9 @@
+﻿  MnistWrapper.cpp
+MnistWrapper.cpp(57): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+MnistWrapper.cpp(88): warning C4244: 'return': conversion from 'double' to 'int', possible loss of data
+MnistWrapper.cpp(92): warning C4244: 'return': conversion from 'double' to 'int', possible loss of data
+MnistWrapper.cpp(96): warning C4244: 'return': conversion from 'double' to 'int', possible loss of data
+MnistWrapper.cpp(100): warning C4244: 'return': conversion from 'double' to 'int', possible loss of data
+  NeuralNetwork.cpp
+  Generating Code...
+  MnistWrapper.vcxproj -> C:\Users\demoh_000\source\repos\MnistWrapper\Debug\MnistWrapper.dll

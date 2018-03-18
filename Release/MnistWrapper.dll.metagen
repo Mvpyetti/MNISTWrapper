@@ -1,0 +1,28 @@
+ImageRuntimeVersion: v4.0.30319
+Assembly MnistWrapper, Version=1.0.*, Culture=Invariant Language (Invariant Country): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Class MnistWrapper.MnistWrapperClass: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    SetNeuronCount(Int32): PrivateScope, Public, HideBySig
+    SetEpochCount(Double): PrivateScope, Public, HideBySig
+    SetEta(Double): PrivateScope, Public, HideBySig
+    SetActFunc(String): PrivateScope, Public, HideBySig
+    TrainNetwork(): PrivateScope, Public, HideBySig
+    ReadImages(String): PrivateScope, Public, HideBySig
+    ReadLabels(String): PrivateScope, Public, HideBySig
+    GetImagesRead(): PrivateScope, Public, HideBySig
+    GetTotalImages(): PrivateScope, Public, HideBySig
+    GetEpochIterator(): PrivateScope, Public, HideBySig
+    GetEpochSize(): PrivateScope, Public, HideBySig
+    FinishedTraining(): PrivateScope, Public, HideBySig
+    FinishedReadingImages(): PrivateScope, Public, HideBySig
+    FinishedReadingLabels(): PrivateScope, Public, HideBySig
