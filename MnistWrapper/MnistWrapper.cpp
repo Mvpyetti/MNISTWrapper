@@ -81,7 +81,11 @@ bool MnistWrapper::MnistWrapperClass::ReadLabels(System::String^ strFile) {
 
 
 bool MnistWrapper::MnistWrapperClass:: FinishedTraining() {
-	return NN->IsFinished();
+	return NN->FinishedTraining();
+}
+
+bool MnistWrapper::MnistWrapperClass::FinishedTesting() {
+	return NN->FinishedTesting();
 }
 
 bool MnistWrapper::MnistWrapperClass::FinishedReadingImages() {
@@ -90,6 +94,14 @@ bool MnistWrapper::MnistWrapperClass::FinishedReadingImages() {
 
 bool MnistWrapper::MnistWrapperClass::FinishedReadingLabels() {
 	return dataFile->finishedReadingLabels;
+}
+
+double MnistWrapper::MnistWrapperClass::GetAccuracy() {
+	return NN->GetAccuracy();
+}
+
+int MnistWrapper::MnistWrapperClass::GetCorrectImages() {
+	return NN->GetCorrectImages();
 }
 
 int MnistWrapper::MnistWrapperClass::GetTotalImages() {
@@ -106,4 +118,9 @@ int MnistWrapper::MnistWrapperClass::GetEpochIterator() {
 
 int MnistWrapper::MnistWrapperClass::GetEpochSize() {
 	return NN->epochSize;
+}
+
+void MnistWrapper::MnistWrapperClass::WriteOutput() {
+	string output = "OutputResults";
+	NN->WriteTestResults(output);
 }

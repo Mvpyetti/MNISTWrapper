@@ -17,12 +17,17 @@ Class MnistWrapper.MnistWrapperClass: AutoLayout, AnsiClass, Class, Public, Befo
     SetEta(Double): PrivateScope, Public, HideBySig
     SetActFunc(String): PrivateScope, Public, HideBySig
     TrainNetwork(): PrivateScope, Public, HideBySig
+    TestNetwork(): PrivateScope, Public, HideBySig
     ReadImages(String): PrivateScope, Public, HideBySig
     ReadLabels(String): PrivateScope, Public, HideBySig
+    GetAccuracy(): PrivateScope, Public, HideBySig
+    GetCorrectImages(): PrivateScope, Public, HideBySig
     GetImagesRead(): PrivateScope, Public, HideBySig
     GetTotalImages(): PrivateScope, Public, HideBySig
     GetEpochIterator(): PrivateScope, Public, HideBySig
     GetEpochSize(): PrivateScope, Public, HideBySig
     FinishedTraining(): PrivateScope, Public, HideBySig
+    FinishedTesting(): PrivateScope, Public, HideBySig
     FinishedReadingImages(): PrivateScope, Public, HideBySig
     FinishedReadingLabels(): PrivateScope, Public, HideBySig
+    WriteOutput(): PrivateScope, Public, HideBySig

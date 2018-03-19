@@ -1,2 +1,3 @@
 ﻿  NeuralNetwork.cpp
-  MnistWrapper.vcxproj -> C:\Users\Tommy\Documents\GitHub\MnistWrapper\Release\MnistWrapper.dll
+NeuralNetwork.cpp(266): warning C4244: 'return': conversion from 'double' to 'int', possible loss of data
+  MnistWrapper.vcxproj -> C:\Users\demoh_000\source\repos\MnistWrapper\Release\MnistWrapper.dll

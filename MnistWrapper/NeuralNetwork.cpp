@@ -104,6 +104,7 @@ void NeuralNetwork::ChangeEta(double inEta) {
 }
 
 void NeuralNetwork::ChangeImageCount(int ImageCount, int EpochCount) {
+	epochSize = ImageCount;
 	totalImages = ImageCount * EpochCount;
 }
 
@@ -125,14 +126,17 @@ void NeuralNetwork::WriteImageResult(string strOutput) {
 }
 
 void NeuralNetwork:: TestImage() {
+	totalImagesRead++;
+	finishedTesting = false;
+
 	ResetOuputs();
 	CalculateOutput();
 	CalculateLabels();
 	if (expectedLabel == correctLabel)
 		correctImages++;
-	totalImagesRead++;
-	if (totalImagesRead >= epochSize) {
-		totalImagesRead = 0;
+	
+	if (totalImagesRead == totalImages) {
+		finishedTesting = true;
 	}
 }
 
@@ -149,6 +153,7 @@ void NeuralNetwork::TrainImage() {
 
 	if (totalImagesRead == totalImages) {
 		finishedTraining = true;
+		totalImagesRead = 0;
 	}
 }
 
@@ -252,6 +257,16 @@ void NeuralNetwork::DisplayLabels() {
 	cout << " Expected Label: " << expectedLabel << " Correct Label: " << correctLabel << endl;
 }
 
+double NeuralNetwork::GetAccuracy() {
+	CalculateTestResults();
+	return testError;
+}
+
+int NeuralNetwork :: GetCorrectImages() {
+	return correctImages;
+}
+
+
 double NeuralNetwork::ActivationFunction(double inValue) {
 	switch (actFunc) {
 	case TANH:
@@ -267,7 +282,7 @@ double NeuralNetwork::ActivationFunction(double inValue) {
 		return ((2.0 / (1 + exp(-(inValue)))) - 1.0);
 		break;
 	default:
-		return 1;
+		return tanh(inValue);;
 	}
 }
 
@@ -297,6 +312,10 @@ void NeuralNetwork::ResetOuputs() {
 	fill(s.begin(), s.end(), 0);
 }
 
-bool NeuralNetwork::IsFinished() {
+bool NeuralNetwork::FinishedTraining() {
 	return finishedTraining;
+}
+
+bool NeuralNetwork::FinishedTesting() {
+	return finishedTesting;
 }

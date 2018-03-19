@@ -33,7 +33,11 @@ public:
 	void WriteImageResult(string);
 	~NeuralNetwork();
 
-	bool IsFinished();
+	double GetAccuracy();
+	int GetCorrectImages();
+
+	bool FinishedTraining();
+	bool FinishedTesting();
 
 	double totalImages;
 	double totalImagesRead;
@@ -87,5 +91,6 @@ private:
 	double error;
 
 	bool finishedTraining;
+	bool finishedTesting;
 };
 

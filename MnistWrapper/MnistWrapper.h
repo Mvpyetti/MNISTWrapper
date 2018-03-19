@@ -24,13 +24,17 @@ namespace MnistWrapper {
 		void TestNetwork();
 		bool ReadImages(System::String^);
 		bool ReadLabels(System::String^);
+		double GetAccuracy();
+		int GetCorrectImages();
 		int GetImagesRead();
 		int GetTotalImages();
 		int GetEpochIterator();
 		int GetEpochSize();
 		bool FinishedTraining();
+		bool FinishedTesting();
 		bool FinishedReadingImages();
 		bool FinishedReadingLabels();
+		void WriteOutput();
 
 	private:
 		NeuralNetwork * NN;
