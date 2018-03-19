@@ -20,6 +20,7 @@ Class MnistWrapper.MnistWrapperClass: AutoLayout, AnsiClass, Class, Public, Befo
     TestNetwork(): PrivateScope, Public, HideBySig
     ReadImages(String): PrivateScope, Public, HideBySig
     ReadLabels(String): PrivateScope, Public, HideBySig
+    ResetMNIST(): PrivateScope, Public, HideBySig
     GetAccuracy(): PrivateScope, Public, HideBySig
     GetCorrectImages(): PrivateScope, Public, HideBySig
     GetImagesRead(): PrivateScope, Public, HideBySig

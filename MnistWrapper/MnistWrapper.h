@@ -24,6 +24,7 @@ namespace MnistWrapper {
 		void TestNetwork();
 		bool ReadImages(System::String^);
 		bool ReadLabels(System::String^);
+		void ResetMNIST();
 		double GetAccuracy();
 		int GetCorrectImages();
 		int GetImagesRead();

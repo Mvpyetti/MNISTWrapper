@@ -43,14 +43,22 @@ void NeuralNetwork :: InitializeWeights() {
 	default_random_engine generator(rd());
 	normal_distribution<double> distribution(0, 0.16);
 
-	fill(b.begin(), b.end(), distribution(generator));
-	fill(c.begin(), c.end(), distribution(generator));
+	for (int i = 0; i < neuronCount; i++) {
+		for (int j = 0; j < 10; j++) {
+			u[i][j] = distribution(generator);
+		}
+	}
 
 	for (int i = 0; i < 784; i++) {
-		fill(w[i].begin(), w[i].end(), distribution(generator));
+		for (int j = 0; j < neuronCount; j++) {
+			w[i][j] = distribution(generator);
+		}
 	}
-	for (int i = 0; i < neuronCount; i++) {
-		fill(u[i].begin(), u[i].end(), distribution(generator));
+	for (int i = 0; i < b.size(); i++) {
+		b[i] = distribution(generator);
+	}
+	for (int i = 0; i < c.size(); i++) {
+		c[i] = distribution(generator);
 	}
 }
 
@@ -137,6 +145,7 @@ void NeuralNetwork:: TestImage() {
 	
 	if (totalImagesRead == totalImages) {
 		finishedTesting = true;
+		totalImagesRead = 0;
 	}
 }
 

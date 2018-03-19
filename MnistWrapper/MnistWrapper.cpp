@@ -79,6 +79,9 @@ bool MnistWrapper::MnistWrapperClass::ReadLabels(System::String^ strFile) {
 		return false;
 }
 
+void MnistWrapper::MnistWrapperClass::ResetMNIST() {
+	dataFile->ResetMNIST();
+}
 
 bool MnistWrapper::MnistWrapperClass:: FinishedTraining() {
 	return NN->FinishedTraining();
