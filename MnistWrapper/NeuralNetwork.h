@@ -34,6 +34,7 @@ public:
 	~NeuralNetwork();
 
 	double GetAccuracy();
+	int GetExpectedLabel();
 	int GetCorrectImages();
 
 	bool FinishedTraining();

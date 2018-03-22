@@ -89,6 +89,17 @@ vector<double> MNIST::GetImage() {
 	return vctRet;
 }
 
+vector<double> MNIST::GetImage(int indexNum) {
+	vector<double> vctRet(784);
+	int imagesIndex = indexNum * 784;
+	int counter = 0;
+	for (int i = imagesIndex; i < imagesIndex + 784; i++) {
+		vctRet[counter] = images[i];
+		counter++;
+	}
+	return vctRet;
+}
+
 vector<double> MNIST::GetLabel() {
 	vector<double> vctRet(10);
 	if (lastlblIndex == num_of_labels) {
@@ -97,6 +108,13 @@ vector<double> MNIST::GetLabel() {
 	double value = labels[lastlblIndex];
 	lastlblIndex++;
 	vctRet = ConvertVector(value);
+	return vctRet;
+}
+
+vector<double> MNIST::GetLabel(int index) {
+	vector<double> vctRet(10);
+	int counter = 0;
+	vctRet = ConvertVector(labels[index]);
 	return vctRet;
 }
 

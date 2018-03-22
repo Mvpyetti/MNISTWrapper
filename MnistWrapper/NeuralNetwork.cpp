@@ -271,6 +271,10 @@ double NeuralNetwork::GetAccuracy() {
 	return testError;
 }
 
+int NeuralNetwork::GetExpectedLabel() {
+	return expectedLabel;
+}
+
 int NeuralNetwork :: GetCorrectImages() {
 	return correctImages;
 }

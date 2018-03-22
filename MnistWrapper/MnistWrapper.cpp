@@ -57,6 +57,12 @@ void MnistWrapper::MnistWrapperClass::TestNetwork() {
 	}
 }
 
+void MnistWrapper::MnistWrapperClass::TestRandomImage(int index) {
+	NN->InsertInputs(dataFile->GetImage(index));
+	NN->InsertLabel(dataFile->GetLabel(index));
+	NN->TestImage();
+}
+
 bool MnistWrapper::MnistWrapperClass::ReadImages(System::String^ strFile) {
 	char* charPtr = (char*)Marshal::StringToHGlobalAnsi(strFile).ToPointer();
 	string cstrFile = string(charPtr);
@@ -105,6 +111,10 @@ double MnistWrapper::MnistWrapperClass::GetAccuracy() {
 
 int MnistWrapper::MnistWrapperClass::GetCorrectImages() {
 	return NN->GetCorrectImages();
+}
+
+int MnistWrapper::MnistWrapperClass::GetExpectedLabel() {
+	return NN->GetExpectedLabel();
 }
 
 int MnistWrapper::MnistWrapperClass::GetTotalImages() {

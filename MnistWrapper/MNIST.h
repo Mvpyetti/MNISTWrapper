@@ -13,7 +13,9 @@ public:
 	bool ReadInputFile(string);
 	bool ReadLabelFile(string);
 	vector<double> GetImage();
+	vector<double> GetImage(int);
 	vector<double> GetLabel();
+	vector<double> GetLabel(int);
 	int GetNumOfImages();
 	void PrintStats();
 	void ResetMNIST();

@@ -22,11 +22,13 @@ namespace MnistWrapper {
 		void SetActFunc(System::String^);
 		void TrainNetwork();
 		void TestNetwork();
+		void TestRandomImage(int);
 		bool ReadImages(System::String^);
 		bool ReadLabels(System::String^);
 		void ResetMNIST();
 		double GetAccuracy();
 		int GetCorrectImages();
+		int GetExpectedLabel();
 		int GetImagesRead();
 		int GetTotalImages();
 		int GetEpochIterator();
