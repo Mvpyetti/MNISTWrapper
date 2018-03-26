@@ -27,6 +27,10 @@ void MnistWrapper::MnistWrapperClass::SetActFunc(System::String^ inFunc) {
 	Marshal::FreeHGlobal(IntPtr(charPtr));
 }
 
+void MnistWrapper::MnistWrapperClass::SetBatchSize(int inBatchSize) {
+	batchSize = inBatchSize;
+}
+
 void MnistWrapper::MnistWrapperClass::SetEpochCount(double inEpoch) {
 	*epochCount = inEpoch;
 }
@@ -41,25 +45,26 @@ void MnistWrapper::MnistWrapperClass::SetNeuronCount(int inNeuronCount) {
 
 void MnistWrapper::MnistWrapperClass::TrainNetwork() {
 	for (int i = 0; i < *epochCount; i++) {
-		for (int j = 0; j < dataFile->GetNumOfImages(); j++) {
-			NN->InsertInputs(dataFile->GetImage());
-			NN->InsertLabel(dataFile->GetLabel());
+		for (int j = 0; j < dataFile->GetNumOfImages()/batchSize; j++) {
+			NN->InsertInputs(dataFile->GetImages(batchSize));
+			NN->InsertLabels(dataFile->GetLabels(batchSize));
 			NN->TrainImage();
 		}
 	}
 }
 
 void MnistWrapper::MnistWrapperClass::TestNetwork() {
+	NN->SetForTest();
 	for (int i = 0; i < dataFile->GetNumOfImages(); i++) {
 		NN->InsertInputs(dataFile->GetImage());
-		NN->InsertLabel(dataFile->GetLabel());
+		NN->InsertLabels(dataFile->GetLabel());
 		NN->TestImage();
 	}
 }
 
 void MnistWrapper::MnistWrapperClass::TestRandomImage(int index) {
 	NN->InsertInputs(dataFile->GetImage(index));
-	NN->InsertLabel(dataFile->GetLabel(index));
+	NN->InsertLabels(dataFile->GetLabel(index));
 	NN->TestImage();
 }
 

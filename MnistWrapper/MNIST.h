@@ -14,8 +14,10 @@ public:
 	bool ReadLabelFile(string);
 	vector<double> GetImage();
 	vector<double> GetImage(int);
+	vector<double> GetImages(unsigned int);
 	vector<double> GetLabel();
 	vector<double> GetLabel(int);
+	vector<double> GetLabels(unsigned int);
 	int GetNumOfImages();
 	void PrintStats();
 	void ResetMNIST();
@@ -24,7 +26,7 @@ public:
 	bool finishedReadingLabels;
 
 private:
-	vector<double> ConvertVector(double);
+	vector<double> ConvertVector(int);
 	int FindBinaryValue(int);
 
 	int data_magic_number;

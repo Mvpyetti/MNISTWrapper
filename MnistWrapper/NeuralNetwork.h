@@ -17,18 +17,20 @@ enum func{
 class NeuralNetwork
 {
 public:
-	NeuralNetwork(int= 50, double= .005, double=1, func = TANH);
+	NeuralNetwork(int = 50, double = .005, int = 5, func = TANH);
 	void ChangeActivationFunc(func);
-	void ChangeBatchSize(double);
-	void ChangeNeuronCount(int);
+	void ChangeBatchSize(unsigned int);
+	void ChangeImageCount(unsigned int, unsigned int);
+	void ChangeNeuronCount(unsigned int);
 	void ChangeEta(double);
-	void ChangeImageCount(int, int);
 	void DisplayError();
 	void DisplayLabels();
 	void InsertInputs(vector<double>);
-	void InsertLabel(vector<double>);
+	void InsertLabels(vector<double>);
 	void TrainImage();
+	void TrainBatch();
 	void TestImage();
+	void SetForTest();
 	void WriteTestResults(string);
 	void WriteImageResult(string);
 	~NeuralNetwork();
@@ -48,23 +50,30 @@ public:
 	double batchSize;
 private:
 	void BackProp();
-	void CalculateOutput();
-	void CalculateDeltas();
-	void CalculateLabels();
+	void CalculateOutput(int);
+	void CalculateDeltaBatch(int);
+	void CalculateDeltaAverages();
+	void CalculateLabels(int);
 	void CalculateTestResults();
 	void InitializeWeights();
+	void ResizeLabels();
 	void ResizeNeurons();
+	void ResizeImages();
+	void ResizeDeltaBatches();
 	void ResetOuputs();
 
 	double ActivationFunction(double);
 	double Derivative(double);
 
+
+	//Images array
+	vector<vector<double>> images;
+	vector<vector<double>> labels;
+
 	//STANDARD VALUES
-	vector<double> x;
 	vector<vector<double>> w;
 	vector<double> b;
 	vector<double> s;
-	vector<double> t;
 	vector<double> y;
 	vector<double> derivy;
 	vector<vector<double>> u;
@@ -79,6 +88,11 @@ private:
 	vector<vector<double>> deltau;
 	vector<double> deltac;
 
+	//Delta Batch Values
+	vector<vector<vector<double>>> deltawBatch;
+	vector<vector<double>> deltabBatch;
+	vector<vector<vector<double>>> deltauBatch;
+	vector<vector<double>> deltacBatch;
 
 	//HYPER PARAMETERS
 	func actFunc;

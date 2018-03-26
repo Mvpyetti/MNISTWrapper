@@ -2,7 +2,7 @@
 #include "NeuralNetwork.h"
 
 
-NeuralNetwork::NeuralNetwork(int inNeuronCount, double inEta, double inBatchSize, func inActFunc)
+NeuralNetwork::NeuralNetwork(int inNeuronCount, double inEta, int inBatchSize, func inActFunc)
 {
 	neuronCount = inNeuronCount;
 	actFunc = inActFunc;
@@ -19,17 +19,36 @@ NeuralNetwork::NeuralNetwork(int inNeuronCount, double inEta, double inBatchSize
 
 	finishedTraining = false;
 
-	x.resize(784);
+	images.resize(inBatchSize);
+	labels.resize(inBatchSize);
+
+	//resize the batchDelta values
+	deltawBatch.resize(inBatchSize);
+	deltabBatch.resize(inBatchSize);
+	deltauBatch.resize(inBatchSize);
+	deltacBatch.resize(inBatchSize);
+
+
+	//resize first layer attributess
 	w.resize(784);
 	deltaw.resize(784);
+
+	//Resize second layer attributes
 	z.resize(10);
 	derivz.resize(10);
 	c.resize(10);
 	deltac.resize(10);
 	r.resize(10);
-	t.resize(10);
+
+	//Resize constant second Layer DeltaC Batches
+	for (unsigned int i = 0; i < batchSize; i++) {
+		deltacBatch[i].resize(10);
+	}
 
 	ResizeNeurons();
+	ResizeDeltaBatches();
+	ResizeImages();
+	ResizeLabels();
 	InitializeWeights();
 }
 
@@ -82,12 +101,51 @@ void NeuralNetwork::ResizeNeurons() {
 	}
 }
 
-void NeuralNetwork::InsertInputs(vector<double> inStream) {
-	x = inStream;
+void NeuralNetwork::ResizeImages() {
+	for (unsigned int i = 0; i < batchSize; i++) {
+		images[i].resize(784);
+	}
 }
 
-void NeuralNetwork::InsertLabel(vector<double> inStream) {
-	t = inStream;
+void NeuralNetwork::ResizeLabels() {
+	for (unsigned int i = 0; i < batchSize; i++) {
+		labels[i].resize(10);
+	}
+}
+
+void NeuralNetwork::ResizeDeltaBatches() {
+	//Resize all the Delta 
+	for (unsigned int i = 0; i < batchSize; i++) {
+		deltawBatch[i].resize(784);
+		deltabBatch[i].resize(neuronCount);
+		deltauBatch[i].resize(neuronCount);
+		for (unsigned int j = 0; j < 784; j++) {
+			deltawBatch[i][j].resize(neuronCount);
+		}
+		for (unsigned int j = 0; j < neuronCount; j++) {
+			deltauBatch[i][j].resize(10);
+		}
+	}
+}
+
+void NeuralNetwork::InsertInputs(vector<double> inStream) {
+	int counter = 0;
+	for (unsigned int i = 0; i < batchSize; i++) {
+		for (unsigned int j = 0; j < 784; j++) {
+			images[i][j] = inStream[counter];
+			counter++;
+		}
+	}
+}
+
+void NeuralNetwork::InsertLabels(vector<double> inStream) {
+	unsigned int counter = 0;
+	for (unsigned int i = 0; i < batchSize; i++) {
+		for (unsigned int j = 0; j < 10; j++) {
+			labels[i][j] = inStream[counter];
+			counter++;
+		}
+	}
 }
 
 void NeuralNetwork::ChangeActivationFunc(func inFunc) {
@@ -95,12 +153,12 @@ void NeuralNetwork::ChangeActivationFunc(func inFunc) {
 	InitializeWeights();
 }
 
-void NeuralNetwork::ChangeBatchSize(double inBatchSize) {
+void NeuralNetwork::ChangeBatchSize(unsigned int inBatchSize) {
 	batchSize = inBatchSize;
 	InitializeWeights();
 }
 
-void NeuralNetwork::ChangeNeuronCount(int inCount) {
+void NeuralNetwork::ChangeNeuronCount(unsigned int inCount) {
 	neuronCount = inCount;
 	ResizeNeurons();
 	InitializeWeights();
@@ -111,7 +169,7 @@ void NeuralNetwork::ChangeEta(double inEta) {
 	InitializeWeights();
 }
 
-void NeuralNetwork::ChangeImageCount(int ImageCount, int EpochCount) {
+void NeuralNetwork::ChangeImageCount(unsigned int ImageCount, unsigned int EpochCount) {
 	epochSize = ImageCount;
 	totalImages = ImageCount * EpochCount;
 }
@@ -138,8 +196,9 @@ void NeuralNetwork:: TestImage() {
 	finishedTesting = false;
 
 	ResetOuputs();
-	CalculateOutput();
-	CalculateLabels();
+	CalculateOutput(0);
+	CalculateLabels(0);
+
 	if (expectedLabel == correctLabel)
 		correctImages++;
 	
@@ -149,14 +208,24 @@ void NeuralNetwork:: TestImage() {
 	}
 }
 
+void NeuralNetwork::SetForTest() {
+	batchSize = 1;
+	totalImages = 0;
+	finishedTesting = false;
+	correctImages = 0;
+}
+
 void NeuralNetwork::TrainImage() {
-	totalImagesRead++;
 	finishedTraining = false;
 
-	ResetOuputs();
-	CalculateOutput();
-	CalculateLabels();
-	CalculateDeltas();
+	for (unsigned int i = 0; i < batchSize; i++) {
+		totalImagesRead++;
+		ResetOuputs();
+		CalculateOutput(i);
+		CalculateLabels(i);
+		CalculateDeltaBatch(i);
+	}
+	CalculateDeltaAverages();
 	BackProp();
 	epochIterator = ((int)totalImagesRead / (int)epochSize)+1;
 
@@ -166,67 +235,131 @@ void NeuralNetwork::TrainImage() {
 	}
 }
 
-void NeuralNetwork::CalculateOutput() {
-	for (int i = 0; i < neuronCount; i++) {
-		for (int j = 0; j < 784; j++) {
-			s[i] += x[j] * w[j][i];
+void NeuralNetwork::CalculateOutput(int index) {
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		for (unsigned int j = 0; j < 784; j++) {
+			s[i] += images[index][j] * w[j][i];
 		}
 		s[i] += b[i];
 		y[i] = ActivationFunction(s[i]);
 		derivy[i] = Derivative(y[i]);
 	}
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < neuronCount; j++) {
+	for (unsigned int i = 0; i < 10; i++) {
+		for (unsigned int j = 0; j < neuronCount; j++) {
 			r[i] += y[j] * u[j][i];
 		}
 		r[i] += c[i];
 		z[i] = ActivationFunction(r[i]);
-		error += pow((z[i] - t[i]), 2);
+		error += pow((z[i] - labels[index][i]), 2);
 		derivz[i] = Derivative(z[i]);
 	}
 	error = error / 10.0;
 }
 
-void NeuralNetwork::CalculateDeltas() {
+void NeuralNetwork::CalculateDeltaBatch(int index) {
 	bool calculatedB = false;
 	bool calculatedU = false;
 	bool calculatedC = false;
 	bool uIsInitialized = false;
+	int inIndex = index;
 	vector<double> placeHolderW(neuronCount);
 	fill(deltac.begin(), deltac.end(), 0);
 	fill(deltab.begin(), deltab.end(), 0);
 
-	for (int i = 0; i < neuronCount; i++) {
-		for (int j = 0; j <10; j++) {
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		for (unsigned int j = 0; j <10; j++) {
 			//placeHolder will represent summation for the weight
-			placeHolderW[i] += (z[j] - t[j]) *(derivz[j])*u[i][j];
-			deltab[i] += (z[j] - t[j]) *(derivz[j]) *u[i][j];
-			deltau[i][j] = (z[j] - t[j])*(derivz[j] * y[i]);
+			placeHolderW[i] += (z[j] - labels[index][j]) *(derivz[j])*u[i][j];
+			deltabBatch[index][i] += (z[j] - labels[index][j]) *(derivz[j]) *u[i][j];
+			deltauBatch[index][i][j] = (z[j] - labels[index][j])*(derivz[j] * y[i]);
 		}
-		deltab[i] = deltab[i] / 10.0;
+		deltabBatch[index][i] = deltab[i] / 10.0;
 	}
 
-	for (int i = 0; i < 784; i++) {
-		for (int j = 0; j < neuronCount; j++) {
-			deltaw[i][j] = placeHolderW[j] / 10.0;
-			deltaw[i][j] *= derivy[j] * x[i];
+	for (unsigned int i = 0; i < 784; i++) {
+		for (unsigned int j = 0; j < neuronCount; j++) {
+			deltawBatch[index][i][j] = placeHolderW[j] / 10.0;
+			deltawBatch[index][i][j] *= derivy[j] * images[index][i];
 		}
 	}
 
-	for (int i = 0; i < 10; i++) {
-		deltac[i] = (z[i] - t[i])*derivz[i];
+	for (unsigned int i = 0; i < 10; i++) {
+		deltacBatch[index][i] = (z[i] - labels[index][i])*derivz[i];
 	}
-
 }
 
-void NeuralNetwork::CalculateLabels() {
+void NeuralNetwork::CalculateDeltaAverages() {
+	vector<vector<double>> deltawSum(784);
+	vector<vector<double>> deltauSum(neuronCount);
+	vector<double> deltacSum(10);
+	vector<double> deltabSum(neuronCount);
+
+	//resize the sum vectors
+	for (unsigned int i = 0; i < 784; i++) {
+		deltawSum[i].resize(neuronCount);
+	}
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		deltauSum[i].resize(10);
+	}
+
+	for (unsigned int i = 0; i < 784; i++) {
+		for (unsigned int j = 0; j < neuronCount; j++) {
+			for (unsigned int l = 0; l < batchSize; l++) {
+				deltawSum[i][j] += deltawBatch[l][i][j];
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		for (unsigned int j = 0; j < 10; j++) {
+			for (unsigned int l = 0; l < batchSize; l++) {
+				deltauSum[i][j] += deltauBatch[l][i][j];
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		for (unsigned int j = 0; j < batchSize; j++) {
+			deltabSum[i] += deltabBatch[j][i];
+		}
+	}
+
+	for (unsigned int i = 0; i < 10; i++) {
+		for (unsigned int j = 0; j < batchSize; j++) {
+			deltacSum[i] += deltacBatch[j][i];
+		}
+	}
+
+	//Find the average
+	for (unsigned int i = 0; i < 784; i++) {
+		for (unsigned int j = 0; j < neuronCount; j++) {
+			deltaw[i][j] = deltawSum[i][j] / batchSize;
+		}
+	}
+
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		for (unsigned int j = 0; j < 10; j++) {
+			deltau[i][j] = deltauSum[i][j] / batchSize;
+		}
+	}
+
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		deltab[i] = deltabSum[i] / batchSize;
+	}
+
+	for (unsigned int i = 0; i < 10; i++) {
+		deltac[i] = deltacSum[i] / batchSize;
+	}
+}
+
+void NeuralNetwork::CalculateLabels(int index) {
 	double maxValue = -100;
-	for (int i = 0; i < 10; i++) {
+	for (unsigned int i = 0; i < 10; i++) {
 		if (maxValue < z[i]) {
 			maxValue = z[i];
 			expectedLabel = i;
 		}
-		if (t[i] == 1) {
+		if (labels[index][i] == 1) {
 			correctLabel = i;
 		}
 	}
@@ -239,8 +372,8 @@ void NeuralNetwork::CalculateTestResults() {
 
 void NeuralNetwork::BackProp() {
 	bool calculatedB = false;
-	for (int i = 0; i < 784; i++) {
-		for (int j = 0; j < neuronCount; j++) {
+	for (unsigned int i = 0; i < 784; i++) {
+		for (unsigned int j = 0; j < neuronCount; j++) {
 			w[i][j] = w[i][j] - (eta * deltaw[i][j]);
 			if (!calculatedB)
 				b[j] = b[j] - (eta * deltab[j]);
@@ -248,8 +381,8 @@ void NeuralNetwork::BackProp() {
 		calculatedB = true;
 	}
 	bool calculatedC = false;
-	for (int i = 0; i < neuronCount; i++) {
-		for (int j = 0; j < 10; j++) {
+	for (unsigned int i = 0; i < neuronCount; i++) {
+		for (unsigned int j = 0; j < 10; j++) {
 			u[i][j] = u[i][j] - (eta * deltau[i][j]);
 			if (!calculatedC)
 				c[j] = c[j] - (eta * deltac[j]);

@@ -17,6 +17,7 @@ namespace MnistWrapper {
 	public:
 		MnistWrapperClass();
 		void SetNeuronCount(int);
+		void SetBatchSize(int);
 		void SetEpochCount(double);
 		void SetEta(double);
 		void SetActFunc(System::String^);
@@ -43,6 +44,7 @@ namespace MnistWrapper {
 		NeuralNetwork * NN;
 		MNIST * dataFile;
 		double * epochCount;
+		int batchSize;
 		map<string, func> * functionMapper;
 	};
 }

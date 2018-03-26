@@ -19,6 +19,7 @@ bool MNIST :: ReadInputFile(string strFile) {
 	ifstream inputFile(strFile, ios::binary);
 	unsigned char tempBinary = 0;
 	finishedReadingInputs = false;
+
 	if (inputFile) {
 		//binary file is given in MSB format, so we need to reverse and find the integers
 		inputFile.read((char*)&data_magic_number, sizeof(data_magic_number));
@@ -76,10 +77,12 @@ bool MNIST::ReadLabelFile(string strFile) {
 vector<double> MNIST::GetImage() {
 	vector<double> vctRet(784);
 	int nextImgIndex = lastImgIndex + 784;
+
 	if (lastImgIndex == 47040000) {
 		nextImgIndex = 784;
 		lastImgIndex = 0;
 	}
+
 	int counter = 0;
 	for (int i = lastImgIndex; i < nextImgIndex; i++) {
 		vctRet[counter] = images[i];
@@ -100,12 +103,25 @@ vector<double> MNIST::GetImage(int indexNum) {
 	return vctRet;
 }
 
+vector<double> MNIST::GetImages(unsigned int imagesReqCount) {
+	vector<double> vctRet;
+	vector<double> tempImage(784);
+	for (unsigned int i = 0; i < imagesReqCount; i++) {
+		//Obtain an image and append it to the vector ret
+		tempImage = GetImage();
+		vctRet.insert(vctRet.end(), tempImage.begin(), tempImage.end());
+	}
+	return vctRet;
+}
+
+
 vector<double> MNIST::GetLabel() {
 	vector<double> vctRet(10);
 	if (lastlblIndex == num_of_labels) {
 		lastlblIndex = 0;
 	}
-	double value = labels[lastlblIndex];
+
+	int value = (int)labels[lastlblIndex];
 	lastlblIndex++;
 	vctRet = ConvertVector(value);
 	return vctRet;
@@ -113,8 +129,21 @@ vector<double> MNIST::GetLabel() {
 
 vector<double> MNIST::GetLabel(int index) {
 	vector<double> vctRet(10);
+	int value = 0;
 	int counter = 0;
-	vctRet = ConvertVector(labels[index]);
+
+	value = (int)labels[index];
+	vctRet = ConvertVector(value);
+	return vctRet;
+}
+
+vector<double> MNIST::GetLabels(unsigned int labelsReqCount) {
+	vector<double> vctRet;
+	vector<double> tempLabel(10);
+	for (unsigned int i = 0; i < labelsReqCount; i++) {
+		tempLabel = GetLabel();
+		vctRet.insert(vctRet.end(), tempLabel.begin(), tempLabel.end());
+	}
 	return vctRet;
 }
 
@@ -122,7 +151,7 @@ int MNIST::GetNumOfImages() {
 	return num_of_images;
 }
 
-vector<double> MNIST::ConvertVector(double value) {
+vector<double> MNIST::ConvertVector(int value) {
 	vector<double> vctRet(10);
 	vctRet[value] = 1.0;
 	return vctRet;
